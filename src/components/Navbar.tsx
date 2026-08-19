@@ -52,7 +52,7 @@ export function Navbar() {
             href={business.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-[var(--color-whatsapp)] px-5 py-2.5 text-sm font-semibold text-white transition-transform hover:scale-[1.03] active:scale-[0.97]"
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-transparent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:border-white/50 hover:bg-white/5 active:scale-[0.97]"
           >
             <MessageCircle className="h-4 w-4" aria-hidden />
             Chat on WhatsApp

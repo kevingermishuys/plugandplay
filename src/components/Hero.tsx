@@ -1,36 +1,14 @@
 "use client";
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { ChevronDown, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
-import Image from "next/image";
-import { useRef, useSyncExternalStore } from "react";
-import { badges, business } from "@/lib/data";
+import { ChevronDown, MessageCircle } from "lucide-react";
+import { useRef } from "react";
+import { business } from "@/lib/data";
 
 const TAGLINE = "Blazing lights, deep beats, and pure summer bliss.";
 
-const DESKTOP_QUERY = "(min-width: 768px)";
-
-function subscribeToDesktopQuery(onChange: () => void) {
-  const mq = window.matchMedia(DESKTOP_QUERY);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function getIsDesktopSnapshot() {
-  return window.matchMedia(DESKTOP_QUERY).matches;
-}
-
-function getIsDesktopServerSnapshot() {
-  return false;
-}
-
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isDesktop = useSyncExternalStore(
-    subscribeToDesktopQuery,
-    getIsDesktopSnapshot,
-    getIsDesktopServerSnapshot,
-  );
   const reduceMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
@@ -49,28 +27,21 @@ export function Hero() {
       className="relative flex min-h-[100dvh] items-center overflow-hidden bg-abyss"
     >
       <motion.div className="absolute inset-0" style={{ scale }}>
-        {isDesktop ? (
-          <video
-            className="h-full w-full object-cover"
-            src="/video/hero.mp4"
-            poster="/images/night.webp"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-hidden
-          />
-        ) : (
-          <Image
-            src="/images/night.webp"
-            alt="Crowd at a Plug & Play festival stage lit in red neon, DJ booth under trussing"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        )}
+        {/* poster is a frame pulled from hero.mp4 itself (see README/ffmpeg
+            note) so that if autoplay is blocked (data saver, low power
+            mode, etc.) the still shown matches the video exactly instead
+            of jump-cutting to an unrelated photo. */}
+        <video
+          className="h-full w-full object-cover"
+          src="/video/hero.mp4"
+          poster="/images/hero-frame.webp"
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-abyss/70 via-abyss/55 to-abyss" />
         <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss/40" />
         <div
@@ -91,7 +62,7 @@ export function Hero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          className="inline-flex items-center gap-2 rounded-full border border-[var(--color-cyan)]/30 bg-white/5 px-4 py-1.5 text-xs font-semibold tracking-[0.2em] text-[var(--color-cyan)] uppercase backdrop-blur-sm"
+          className="inline-block max-w-full rounded-2xl border border-[var(--color-cyan)]/30 bg-white/5 px-3.5 py-2 text-center text-[10px] leading-relaxed font-semibold tracking-[0.1em] text-[var(--color-cyan)] uppercase backdrop-blur-sm sm:rounded-full sm:px-4 sm:py-1.5 sm:text-xs sm:tracking-[0.2em]"
         >
           Sound · AV · Lighting · Staging · Live Events
         </motion.div>
@@ -127,10 +98,10 @@ export function Hero() {
             href={business.whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="glow-whatsapp inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--color-whatsapp)] px-7 py-3.5 text-base font-semibold text-white transition-transform hover:scale-[1.03] active:scale-[0.97]"
+            className="glow-pink inline-flex min-h-[48px] items-center justify-center gap-2 rounded-full bg-[var(--color-pink)] px-7 py-3.5 text-base font-semibold text-white transition-transform hover:scale-[1.03] active:scale-[0.97]"
           >
             <MessageCircle className="h-5 w-5" aria-hidden />
-            Chat on WhatsApp
+            Request Quote
           </a>
           <a
             href="#showcase"
@@ -138,27 +109,6 @@ export function Hero() {
           >
             See Our Work
           </a>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.56, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-10 flex flex-wrap gap-3"
-        >
-          {badges.map((badge, i) => (
-            <span
-              key={badge}
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-surface/70 px-3.5 py-2 text-xs font-medium text-white/80 backdrop-blur-sm"
-            >
-              {i === 0 ? (
-                <Sparkles className="h-3.5 w-3.5 text-[var(--color-cyan)]" aria-hidden />
-              ) : (
-                <ShieldCheck className="h-3.5 w-3.5 text-[var(--color-pink)]" aria-hidden />
-              )}
-              {badge}
-            </span>
-          ))}
         </motion.div>
       </motion.div>
 
