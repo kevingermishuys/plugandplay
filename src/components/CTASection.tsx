@@ -57,10 +57,12 @@ export function CTASection() {
             </a>
             <a
               href={`mailto:${business.email}`}
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-surface/70 p-4 transition-colors hover:border-white/25"
+              className="flex min-w-0 items-center gap-3 rounded-xl border border-white/10 bg-surface/70 p-4 transition-colors hover:border-white/25"
             >
               <Mail className="h-5 w-5 shrink-0 text-[var(--color-cyan)]" aria-hidden />
-              <span className="text-sm break-all text-white/80">{business.email}</span>
+              <span className="min-w-0 overflow-hidden text-xs text-ellipsis whitespace-nowrap text-white/80 sm:text-sm">
+                {business.email}
+              </span>
             </a>
             <div className="flex items-center gap-3 rounded-xl border border-white/10 bg-surface/70 p-4">
               <MapPin className="h-5 w-5 shrink-0 text-[var(--color-cyan)]" aria-hidden />

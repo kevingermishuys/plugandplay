@@ -23,10 +23,10 @@ export function About() {
               no last-minute sub-hires, no surprises on the invoice.
             </p>
 
-            <RevealStagger className="mt-10 grid grid-cols-2 gap-x-6 gap-y-8">
+            <RevealStagger className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
               {stats.map((stat) => (
                 <motion.div key={stat.label} variants={staggerItem}>
-                  <p className="font-display text-2xl font-extrabold text-gradient-groove sm:text-3xl">
+                  <p className="font-display text-xl font-extrabold text-gradient-groove sm:text-3xl">
                     {stat.value}
                   </p>
                   <p className="mt-1 text-sm text-white/60">{stat.label}</p>

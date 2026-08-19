@@ -2,13 +2,40 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
-import { useRef } from "react";
+import Image from "next/image";
+import { useRef, useSyncExternalStore } from "react";
 import { business } from "@/lib/data";
 
 const TAGLINE = "Blazing lights, deep beats, and pure summer bliss.";
 
+const DESKTOP_QUERY = "(min-width: 768px)";
+
+function subscribeToDesktopQuery(onChange: () => void) {
+  const mq = window.matchMedia(DESKTOP_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getIsDesktopSnapshot() {
+  return window.matchMedia(DESKTOP_QUERY).matches;
+}
+
+function getIsDesktopServerSnapshot() {
+  return false;
+}
+
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
+  // Video only renders on >=768px viewports. On mobile, browsers that
+  // block autoplay (Chrome Data Saver, iOS Low Power Mode) don't just
+  // fail silently — they overlay a manual "tap to play" button on the
+  // <video> element, which looks broken on a decorative background.
+  // Skipping the element entirely on mobile avoids that outright.
+  const isDesktop = useSyncExternalStore(
+    subscribeToDesktopQuery,
+    getIsDesktopSnapshot,
+    getIsDesktopServerSnapshot,
+  );
   const reduceMotion = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
@@ -27,21 +54,28 @@ export function Hero() {
       className="relative flex min-h-[100dvh] items-center overflow-hidden bg-abyss"
     >
       <motion.div className="absolute inset-0" style={{ scale }}>
-        {/* poster is a frame pulled from hero.mp4 itself (see README/ffmpeg
-            note) so that if autoplay is blocked (data saver, low power
-            mode, etc.) the still shown matches the video exactly instead
-            of jump-cutting to an unrelated photo. */}
-        <video
-          className="h-full w-full object-cover"
-          src="/video/hero.mp4"
-          poster="/images/hero-frame.webp"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-        />
+        {isDesktop ? (
+          <video
+            className="h-full w-full object-cover"
+            src="/video/hero.mp4"
+            poster="/images/hero-frame.webp"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            aria-hidden
+          />
+        ) : (
+          <Image
+            src="/images/hero-frame.webp"
+            alt="Close-up of a Plug & Play DJ mixer lit in neon pink and blue"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
+          />
+        )}
         <div className="absolute inset-0 bg-gradient-to-b from-abyss/70 via-abyss/55 to-abyss" />
         <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss/40" />
         <div

@@ -48,10 +48,10 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${business.email}`}
-                  className="flex items-center gap-2 text-sm text-white/60 transition-colors hover:text-[var(--color-cyan)]"
+                  className="flex min-w-0 items-center gap-2 text-sm text-white/60 transition-colors hover:text-[var(--color-cyan)]"
                 >
                   <Mail className="h-4 w-4 shrink-0" aria-hidden />
-                  {business.email}
+                  <span className="overflow-hidden text-ellipsis whitespace-nowrap">{business.email}</span>
                 </a>
               </li>
               <li className="flex items-start gap-2 text-sm text-white/60">
