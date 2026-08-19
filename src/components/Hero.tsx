@@ -2,41 +2,51 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { ChevronDown, MessageCircle } from "lucide-react";
-import Image from "next/image";
-import { useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
 import { business } from "@/lib/data";
 
 const TAGLINE = "Blazing lights, deep beats, and pure summer bliss.";
 
-const DESKTOP_QUERY = "(min-width: 768px)";
-
-function subscribeToDesktopQuery(onChange: () => void) {
-  const mq = window.matchMedia(DESKTOP_QUERY);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-}
-
-function getIsDesktopSnapshot() {
-  return window.matchMedia(DESKTOP_QUERY).matches;
-}
-
-function getIsDesktopServerSnapshot() {
-  return false;
-}
+// Gesture events that reliably count as a "user gesture" for browser
+// autoplay policies (scroll does NOT qualify on Safari, so it's excluded).
+const GESTURE_EVENTS = ["touchstart", "pointerdown", "click", "keydown"] as const;
 
 export function Hero() {
   const sectionRef = useRef<HTMLElement>(null);
-  // Video only renders on >=768px viewports. On mobile, browsers that
-  // block autoplay (Chrome Data Saver, iOS Low Power Mode) don't just
-  // fail silently — they overlay a manual "tap to play" button on the
-  // <video> element, which looks broken on a decorative background.
-  // Skipping the element entirely on mobile avoids that outright.
-  const isDesktop = useSyncExternalStore(
-    subscribeToDesktopQuery,
-    getIsDesktopSnapshot,
-    getIsDesktopServerSnapshot,
-  );
+  const videoRef = useRef<HTMLVideoElement>(null);
   const reduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    // No `autoplay` attribute on the element itself — we drive playback
+    // from JS instead. This matters: when the *autoplay attribute*
+    // is blocked (iOS Low Power Mode, Chrome Data Saver), some browsers
+    // render a native "blocked" play-button glyph over the video as a
+    // side effect of that attribute specifically. A script-driven
+    // .play() call that gets rejected just fails silently — no button,
+    // the poster frame stays put. We then retry once on the user's
+    // first real interaction anywhere on the page, which satisfies the
+    // "user gesture" requirement most autoplay policies relax for.
+    let unlocked = false;
+    video.play().catch(() => {});
+
+    const tryUnlock = () => {
+      if (unlocked) return;
+      unlocked = true;
+      video.play().catch(() => {});
+      GESTURE_EVENTS.forEach((evt) => window.removeEventListener(evt, tryUnlock));
+    };
+
+    GESTURE_EVENTS.forEach((evt) =>
+      window.addEventListener(evt, tryUnlock, { once: true, passive: true }),
+    );
+
+    return () => {
+      GESTURE_EVENTS.forEach((evt) => window.removeEventListener(evt, tryUnlock));
+    };
+  }, []);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -54,28 +64,17 @@ export function Hero() {
       className="relative flex min-h-[100dvh] items-center overflow-hidden bg-abyss"
     >
       <motion.div className="absolute inset-0" style={{ scale }}>
-        {isDesktop ? (
-          <video
-            className="h-full w-full object-cover"
-            src="/video/hero.mp4"
-            poster="/images/hero-frame.webp"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            aria-hidden
-          />
-        ) : (
-          <Image
-            src="/images/hero-frame.webp"
-            alt="Close-up of a Plug & Play DJ mixer lit in neon pink and blue"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-        )}
+        <video
+          ref={videoRef}
+          className="h-full w-full object-cover"
+          src="/video/hero.mp4"
+          poster="/images/hero-frame.webp"
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-hidden
+        />
         <div className="absolute inset-0 bg-gradient-to-b from-abyss/70 via-abyss/55 to-abyss" />
         <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss/40" />
         <div
