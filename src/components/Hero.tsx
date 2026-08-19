@@ -77,14 +77,6 @@ export function Hero() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-abyss/70 via-abyss/55 to-abyss" />
         <div className="absolute inset-0 bg-gradient-to-t from-abyss via-transparent to-abyss/40" />
-        <div
-          aria-hidden
-          className="absolute inset-0 opacity-60"
-          style={{
-            background:
-              "radial-gradient(ellipse 70% 50% at 50% 100%, rgba(255,0,85,0.25), transparent 60%)",
-          }}
-        />
       </motion.div>
 
       <motion.div
